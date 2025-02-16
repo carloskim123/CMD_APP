@@ -1,4 +1,5 @@
 import os
+from pickle import NEWOBJ
 import time
 from db_manager import DatabaseManager
 import random
@@ -8,6 +9,10 @@ from termcolor import colored
 database = DatabaseManager()
 
 
+def find_todo_by_id(todo_id):
+    for todo in database.db:
+        if todo['id'] == todo_id:
+            return todo
 
 def clear_screen():
     if os.name == 'nt':
@@ -28,8 +33,8 @@ def run_menu():
             view_todos()
         case 3:
             delete_todo()
-        # case 4:
-            # edit_todo()
+        case 4:
+            edit_todo()
         case 5:
             exit()
         case _:
@@ -43,30 +48,57 @@ def new_todo():
 
     database.add_entry(id, title, content)
 
-    refresh()
+    refresh(2)
 
 def view_todos():
 
     todo_count = len(database.db)
-
+    print("\n")
     if todo_count == 0:
         print(f"You have no todo's left today!!")
-        refresh()
+        refresh(2)
     else:
         print(f"You have {todo_count} todo's left today!!\n")
         # render todos
+        print(colored("*\x1B[3mpress any key to return to main view\x1B[*", "green"))
+
+        print("Todos: ")
         for todo in database.db:
-            print(colored("*\x1B[3mpress any key to return to main view\x1B[*", "green"))
-            print("Todos: ")
             print(f"  - ({todo['id']}) {todo['title']}: {todo['content']}\n")
 
-            # Detect keypress to
+        refresh(5)
+
+            # Detect keypress
 
 def delete_todo():
-    return
+    todo_id = (int(input("Enter todo id: ")))
 
-def refresh():
-    time.sleep(2)
+    if todo_id:
+        database.remove_entry(todo_id)
+        refresh(3)
+    else:
+        refresh(2)
+
+def edit_todo():
+    todo_id = int(input("Enter todo id: "))
+
+    # todo = find_todo_by_id(todo_id)
+    located_todo = {}
+
+    for todo in database.db:
+        if todo['id'] == todo_id:
+            located_todo = todo
+
+    print(type(located_todo)) # <class 'dict'>
+    new_title = input(f'Edit todo title ({located_todo["title"]}): ')
+    new_content = input(f'Edit todo title ({located_todo["content"]}): ')
+
+    updated_todo = {"id": located_todo['id'], "title": new_title, "content": new_content}
+    database.edit_entry(updated_todo)
+    refresh(2)
+
+def refresh(duration):
+    time.sleep(duration)
     clear_screen()
     run_menu()
 

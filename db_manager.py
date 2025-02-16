@@ -26,22 +26,30 @@ class DatabaseManager:
         print("Added:", title)
 
     # Method to edit an entry
-    def edit_entry(self, index, new_title, new_content):
-        if 0 <= index < len(self.db):  # Check if index is valid
-            self.db[index]["title"] = new_title
-            self.db[index]["content"] = new_content
-            self.save_db()
-            print(f"Edited entry {index}: {new_title}")
-        else:
-            print("Invalid index")
+    def edit_entry(self, edited_todo):
+         # Check if index is valid
+         for todo in self.db:
+            if todo['id'] == edited_todo['id']:
+                todo['title'] = edited_todo['title']
+                todo["content"] = edited_todo['content']
+                self.save_db()
+                print(f"Edited entry {todo['id']}: {todo['title']}")
 
     # Method to remove an entry
-    def remove_entry(self, index):
-        if 0 <= index < len(self.db):  # Check if index is valid
-            removed = self.db.pop(index)  # Remove the entry
-            self.save_db()
-            print(f"Removed: {removed['title']}")
-        else:
+    def remove_entry(self, todo_id):
+        found = False # track if the todo is found
+
+        for todo in self.db:  # Iterate the db
+            if todo["id"] == todo_id:
+                # Remove the entry
+                print(f"Removed: {todo['title']}")
+
+                self.db.remove(todo)
+                self.save_db()
+                found = True
+                continue
+
+        if not found:
             print("Invalid index")
 
     # Method to display all entries
