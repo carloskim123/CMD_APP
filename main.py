@@ -51,8 +51,11 @@ def new_todo():
     refresh(2)
 
 def view_todos():
-
     todo_count = len(database.db)
+
+    while keyboard.is_pressed('enter'):
+        pass
+
     print("\n")
     if todo_count == 0:
         print(f"You have no todo's left today!!")
@@ -66,9 +69,12 @@ def view_todos():
         for todo in database.db:
             print(f"  - ({todo['id']}) {todo['title']}: {todo['content']}\n")
 
-        refresh(5)
+        while True:
+            # Detect key press
+            event = keyboard.read_event(suppress=True)
 
-            # Detect keypress
+            if event.event_type == keyboard.KEY_DOWN and event.name != 'enter':
+                refresh(0)
 
 def delete_todo():
     todo_id = (int(input("Enter todo id: ")))
